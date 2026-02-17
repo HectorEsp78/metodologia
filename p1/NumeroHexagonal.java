@@ -4,6 +4,6 @@ public class NumeroHexagonal {
     }
 
     public static int calculoFormula(){
-        
+        return 0;
     }
 }
