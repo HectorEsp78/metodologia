@@ -44,8 +44,8 @@ public class NumeroHexagonal {
     public static int calculoSerieRecursivo(int n) {
         n--; // 1
         int h; // 1
-        if (n == 0)
-            h = 1; // 2
+        if (n == 0)  // 1
+            h = 1; // 1
         else
             h = 4 * n + 1 + calculoSerieRecursivo(n); // 4 + T(n-1)
         return h; // 1
