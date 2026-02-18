@@ -37,7 +37,8 @@ public class NumeroHexagonal {
     y cada llamada es constante. 
     */
     public static int calculoSerieRecursivo(int n){
-        if(n == 0) return 0;
-        return 4*n-3 + calculoSerieRecursivo(n-1);
+        n--;  // 1
+        if(n == 0) return 1;  // 2
+        return 4*n+1 + calculoSerieRecursivo(n);  // 4 + T(n-1)
     }
 }
