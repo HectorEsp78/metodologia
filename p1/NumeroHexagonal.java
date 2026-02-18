@@ -30,7 +30,14 @@ public class NumeroHexagonal {
         }
         return h; // 1
     }
+
+    /*
+    Aplicamos la fórmula pero esta vez usando un método recursivo
+    La complejidad asisntótica es del orden O(n), ya que el método se llama n veces,
+    y cada llamada es constante. 
+    */
     public static int calculoSerieRecursivo(int n){
-        return 0;
+        if(n == 0) return 0;
+        return 4*n-3 + calculoSerieRecursivo(n-1);
     }
 }
