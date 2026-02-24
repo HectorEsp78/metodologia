@@ -8,7 +8,7 @@ public class NumeroHexagonal {
         System.out.print("Cómo desea ver los tiempos de ejecución? (nano/mili): ");
         String opcion = sc.nextLine();
         boolean nano = opcion.equalsIgnoreCase("nano");
-        System.out.println("\nTabla de números hexagonales:");
+        System.out.println("\nTabla de números hexagonales (calculado con una media de 30 ejecuciones) :");
         MostrarTabla(nano);
     }
 
@@ -55,33 +55,33 @@ public class NumeroHexagonal {
         long inicio, fin;
         // Calcular tiempo promedio para la fórmula
         long total = 0;
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 30; i++) {
             inicio = System.nanoTime();
             calculoFormula(n);
             fin = System.nanoTime();
             total += (fin - inicio);
         }
-        tiempos[0] = total / 1000;
+        tiempos[0] = total / 30;
 
         // Calcular tiempo promedio para el método iterativo
         total = 0;
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 30; i++) {
             inicio = System.nanoTime();
             calculoSerieIterativo(n);
             fin = System.nanoTime();
             total += (fin - inicio);
         }
-        tiempos[1] = total / 1000;
+        tiempos[1] = total / 30;
 
         // Calcular tiempo promedio para el método recursivo
         total = 0;
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 30; i++) {
             inicio = System.nanoTime();
             calculoSerieRecursivo(n);
             fin = System.nanoTime();
             total += (fin - inicio);
         }
-        tiempos[2] = total / 1000;
+        tiempos[2] = total / 30;
 
         return tiempos;
     }
