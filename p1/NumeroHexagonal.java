@@ -4,13 +4,12 @@ public class NumeroHexagonal {
     public static final Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        System.out.println("Calculo del numero hexagonal N.");
-        System.out.print("Introduce el valor de N: ");
-        int n = sc.nextInt();
 
-        System.out.printf("Calculo con formula: %d\n", calculoFormula(n));
-        System.out.printf("Calculo con serie iterativa: %d\n", calculoSerieIterativo(n));
-        System.out.printf("Calculo con serie recursiva: %d\n", calculoSerieRecursivo(n));
+        System.out.print("Cómo desea ver los tiempos de ejecución? (nano/mili): ");
+        String opcion = sc.nextLine();
+        boolean nano = opcion.equalsIgnoreCase("nano");
+        System.out.println("\nTabla de números hexagonales:");
+        MostrarTabla(nano);
     }
 
     /*
@@ -49,5 +48,39 @@ public class NumeroHexagonal {
         else
             h = 4 * n + 1 + calculoSerieRecursivo(n); // 4 + T(n-1)
         return h; // 1
+    }
+
+    public static void MostrarTabla(boolean nano) {
+        int[] n = { 10, 100, 500, 1000, 5000, 8000 , 10000, 11000, 12000};
+        if(nano)
+            System.out.println("   N   |\tValor     |\t Tiempo (ns) (Fórmula)  |Tiempo (ns) (Iterativo)  |\tTiempo (ns) (Recursivo)\n--------------------------------------------------------------------------------------------------\n");
+        else
+            System.out.println("   N   |\tValor     |\t Tiempo (ms) (Fórmula)  |Tiempo (ms) (Iterativo)  |\tTiempo (ms) (Recursivo)\n--------------------------------------------------------------------------------------------------\n");
+        for(int i=0; i<n.length; i++){
+            long inicio = System.nanoTime();
+            int valorFormula = calculoFormula(n[i]);
+            long fin = System.nanoTime();
+            double duracionFormula = fin - inicio;
+
+            inicio = System.nanoTime();
+            calculoSerieIterativo(n[i]);
+            fin = System.nanoTime();
+            double duracionIterativo = fin - inicio;
+
+            inicio = System.nanoTime();
+            calculoSerieRecursivo(n[i]);
+            fin = System.nanoTime();
+            double duracionRecursivo = fin - inicio;
+
+            if(!nano){
+                duracionFormula /= 1000000; // Convertir a milisegundos
+                duracionIterativo /= 1000000; // Convertir a milisegundos
+                duracionRecursivo /= 1000000; // Convertir a milisegundos
+            }
+
+            System.out.printf("%-7d|\t%-10d|\t%-24.6f|%-25.6f|\t%-20.6f\n", n[i], valorFormula, duracionFormula, duracionIterativo, duracionRecursivo);
+        }
+    
+    
     }
 }
