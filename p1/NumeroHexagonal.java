@@ -52,10 +52,10 @@ public class NumeroHexagonal {
 
     public static void MostrarTabla(boolean nano) {
         int[] n = { 10, 100, 500, 1000, 5000, 8000 , 10000, 11000, 12000};
-        if(nano)
-            System.out.println("   N   |\tValor     |\t Tiempo (ns) (Fórmula)  |Tiempo (ns) (Iterativo)  |\tTiempo (ns) (Recursivo)\n--------------------------------------------------------------------------------------------------\n");
-        else
-            System.out.println("   N   |\tValor     |\t Tiempo (ms) (Fórmula)  |Tiempo (ms) (Iterativo)  |\tTiempo (ms) (Recursivo)\n--------------------------------------------------------------------------------------------------\n");
+        System.out.println("----------------------------------------------------------------------------");
+        System.out.printf("| %-5s | %-10s | %-15s | %-15s | %-15s |%n", "N", "Valor", "Fórmula", "Iterativo", "Recursivo");
+        System.out.println("----------------------------------------------------------------------------");
+        
         for(int i=0; i<n.length; i++){
             long inicio = System.nanoTime();
             int valorFormula = calculoFormula(n[i]);
@@ -76,9 +76,13 @@ public class NumeroHexagonal {
                 duracionFormula /= 1000000; // Convertir a milisegundos
                 duracionIterativo /= 1000000; // Convertir a milisegundos
                 duracionRecursivo /= 1000000; // Convertir a milisegundos
+
+                System.out.printf("| %-5d | %-10d | %-12.6f ms | %-12.6f ms | %-12.6f ms |%n", n[i], valorFormula, duracionFormula, duracionIterativo, duracionRecursivo);
+            } else{
+                System.out.printf("| %-5d | %-10d | %-12.2f ns | %-12.2f ns | %-12.2f ns |%n", n[i], valorFormula, duracionFormula, duracionIterativo, duracionRecursivo);
             }
 
-            System.out.printf("%-7d|\t%-10d|\t%-24.6f|%-25.6f|\t%-20.6f\n", n[i], valorFormula, duracionFormula, duracionIterativo, duracionRecursivo);
+            
         }
     
     
