@@ -1,0 +1,8 @@
+git checkout -b oscar     //primera vez
+git add .
+git commit -m ""
+git checkout main
+git pull origin main
+git pull origin main
+git merge oscar
+git push origin main
