@@ -1,19 +1,21 @@
 
 import java.util.Scanner;
 
-class BatallaPokemon{
-    
+class BatallaPokemon {
+static Scanner scanner = new Scanner(System.in);
+
     public static void main(String[] args) {
-        // es importante usar la ruta correcta relativa al directorio desde el
-        // que se ejecuta el programa; en nuestro caso el fichero está en p2/
         int[] danos = leerArchivoDanos("p2/DatosPokemon1.txt");
-        System.out.println("Daños leídos: " + java.util.Arrays.toString(danos));
+        mostrarDatosBatalla(danos);
+
+        System.out.println("\n\nIntroduce el entrnador cuyo daños quiere evaluar (A o B): ");
+        String opcion= scanner.nextLine().toUpperCase();
+        mostrarDanosNetosEntrenadorRecursivo(opcion, danos);
+
     }
 
     public static int[] leerArchivoDanos(String nombreArchivo) {
-        // el archivo de ejemplo no tiene un tamaño en la primera posición,
-        // por eso iteraremos hasta que no queden enteros. Usamos una lista
-        // para poder almacenar una cantidad desconocida de valores.
+
         try (Scanner scanner = new Scanner(new java.io.File(nombreArchivo))) {
             java.util.List<Integer> lista = new java.util.ArrayList<>();
             while (scanner.hasNextInt()) {
@@ -28,5 +30,31 @@ class BatallaPokemon{
             System.out.println("Archivo no encontrado: " + nombreArchivo);
             return null;
         }
+    }
+
+    public static void mostrarDatosBatalla(int[] danos) {
+        if (danos == null) {
+            System.out.println("No se pudieron cargar los datos de daños.");
+            return;
+        } else {
+            System.out.println("\n\nDaños de la batalla:");
+            for(int i=0; i<danos.length; i++){
+                System.out.print(danos[i] + " ");
+            }
+        }
+    }
+
+    public static void mostrarDanosNetosEntrenadorRecursivo(String opcion, int[] danos){
+        int danoTotal = 0;
+        for(int i=0; i<danos.length; i++){
+            if(opcion.equals("A") && danos[i]>0){
+                danoTotal += danos[i];
+            } else if(opcion.equals("B") && danos[i]<0){
+                danoTotal += danos[i];
+            }
+        }
+        if(opcion.equals("B"))
+            danoTotal *= -1; // Convertir a positivo para mostrar el daño neto
+        System.out.println("Daño neto del entrenador " + opcion + ": " + danoTotal);
     }
 }
