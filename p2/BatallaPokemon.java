@@ -19,16 +19,16 @@ class BatallaPokemon {
         // el archivo de ejemplo no tiene un tamaño en la primera posición,
         // por eso iteraremos hasta que no queden enteros. Usamos una lista
         // para poder almacenar una cantidad desconocida de valores.
+        List<Integer> danos = new ArrayList<>();
         try {
             Scanner sc = new Scanner(new File(nombreArchivo));
+            while (sc.hasNextInt()) {
+                danos.add(sc.nextInt());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        List<Integer> danos = new ArrayList<>();
-        while (sc.hasNextInt()) {
-            danos.add(sc.nextInt());
-        }
         return danos;
     }
 }
