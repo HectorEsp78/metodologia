@@ -9,16 +9,14 @@ class BatallaPokemon {
     public static final Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        // es importante usar la ruta correcta relativa al directorio desde el
-        // que se ejecuta el programa; en nuestro caso el fichero está en p2/
         List<Integer> danos = leerArchivoDanos("p2/DatosPokemon1.txt");
         System.out.println("Daños leídos: " + danos.toString());
+
+        System.out.println("Iterativo: " + sumaDanosIterativo(danos, "A"));
+        System.out.println("Recursivo: " + sumaDanosRecursivo(danos, "A", 0, danos.size()-1));
     }
 
     public static List<Integer> leerArchivoDanos(String nombreArchivo) {
-        // el archivo de ejemplo no tiene un tamaño en la primera posición,
-        // por eso iteraremos hasta que no queden enteros. Usamos una lista
-        // para poder almacenar una cantidad desconocida de valores.
         List<Integer> danos = new ArrayList<>();
         try {
             Scanner sc = new Scanner(new File(nombreArchivo));
@@ -30,5 +28,41 @@ class BatallaPokemon {
         }
 
         return danos;
+    }
+
+    public static int sumaDanosIterativo(List<Integer> danos, String entrenador){
+        int suma = 0;
+        int i = 0;
+        if(entrenador.toLowerCase().equals("a")){
+            while(i < danos.size()){
+                if(danos.get(i) > 0){
+                    suma += danos.get(i);
+                }
+                i++;
+            }
+        } else {
+            while(i < danos.size()){
+                if(danos.get(i) < 0){
+                    suma += danos.get(i)*-1;
+                }
+                i++;
+            }
+        }
+        
+        return suma;
+    }
+
+    public static int sumaDanosRecursivo(List<Integer> v, String entrenador, int li, int ls){
+        if(ls <= li){
+            if((entrenador.toLowerCase().equals("a") && v.get(0) > 0) || (entrenador.toLowerCase().equals("b") && v.get(0) < 0)){
+                return v.get(0);
+            } else {
+                return 0;
+            }
+        }
+        int mitad = (li+ls)/2;
+        return sumaDanosRecursivo(v, entrenador, li, mitad-1) + sumaDanosRecursivo(v, entrenador, mitad, ls);
+        
+        
     }
 }
