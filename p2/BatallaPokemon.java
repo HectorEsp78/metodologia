@@ -9,51 +9,146 @@ class BatallaPokemon {
     public static final Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        List<Integer> danos = leerArchivoDanos("p2/DatosPokemon1.txt");
-        System.out.println("Daños leídos: " + danos.toString());
+        long tInicio, tFinal;
+        int sumaDanos, masFuerte;
 
-        System.out.print("Elige un entrenador (A/B): ");
-        String entrenador = sc.next().toUpperCase();
-        System.out.println("\n");
+        /*********************
+        *    COMBATE LIGA    *
+        **********************/
+        
+        System.out.println("--- Leyendo fichero 'combate_liga.txt' ---");
+        List<Integer> datosLiga = leerArchivo("combate_liga.txt");
+        System.out.println("Numero de registros: " + datosLiga.size());
 
-        if (entrenador.equals("A") || entrenador.equals("B")) {
-            probarMetodos(danos, entrenador);
-            int ganador = ganador(danos);
-            switch (ganador) {
-                case 0:
-                    System.out.println("EL GANADOR DE LA BATALLA ES: A");
-                    break;
-                case 1:
-                    System.out.println("EL GANADOR DE LA BATALLA ES: B");
-                    break;
-                default:
-                    System.out.println("EMPATE!");
-                    break;
-            }
-        } else
-            System.out.println("Opcion invalida, finalizando...");
+        tInicio = System.nanoTime();
+        sumaDanos = sumaDanosIterativo(datosLiga, false);
+        tFinal = System.nanoTime();
+        System.out.printf("Daño neto A (Iterativo - liga): %d (Tiempo %,dns)\n", sumaDanos, (tFinal-tInicio));
 
+        tInicio = System.nanoTime();
+        sumaDanos = sumaDanosRecursivo(datosLiga, false, 0, datosLiga.size()-1);
+        tFinal = System.nanoTime();
+        System.out.printf("Daño neto A (Recursivo - liga): %d (Tiempo %,dns)\n", sumaDanos, (tFinal-tInicio));
+
+        tInicio = System.nanoTime();
+        sumaDanos = sumaDanosIterativo(datosLiga, true);
+        tFinal = System.nanoTime();
+        System.out.printf("Daño neto B (Iterativo - liga): %d (Tiempo %,dns)\n", sumaDanos, (tFinal-tInicio));
+
+        tInicio = System.nanoTime();
+        sumaDanos = sumaDanosRecursivo(datosLiga, true, 0, datosLiga.size()-1);
+        tFinal = System.nanoTime();
+        System.out.printf("Daño neto B (Recursivo - liga): %d (Tiempo %,dns)\n", sumaDanos*-1, (tFinal-tInicio));
+
+        int ganador = ganador(datosLiga);
+        System.out.print("Ganador (liga): ");
+        if(ganador == 0) System.out.println("Entrenador A");
+        if(ganador == 1) System.out.println("Entrenador B");
+
+        System.out.println();
+
+        tInicio = System.nanoTime();
+        masFuerte = ataqueMasFuerteIt(datosLiga, false);
+        tFinal = System.nanoTime();
+        System.out.printf("Ataque Pokemon más fuerte A (Iterativo - liga): pos=%d, daño=%d Tiempo: %,dns)\n", masFuerte, datosLiga.get(masFuerte), (tFinal - tInicio));
+
+        tInicio = System.nanoTime();
+        masFuerte = ataqueMasFuerteDYV(datosLiga, 0, datosLiga.size()-1, false);
+        tFinal = System.nanoTime();
+        System.out.printf("Ataque Pokemon más fuerte A (Recursivo - liga): pos=%d, daño=%d Tiempo: %,dns)\n", masFuerte, datosLiga.get(masFuerte), (tFinal - tInicio));
+
+        tInicio = System.nanoTime();
+        masFuerte = ataqueMasFuerteIt(datosLiga, true);
+        tFinal = System.nanoTime();
+        System.out.printf("Ataque Pokemon más fuerte B (Iterativo - liga): pos=%d, daño=%d Tiempo: %,dns)\n", masFuerte, datosLiga.get(masFuerte)*-1, (tFinal - tInicio));
+
+        tInicio = System.nanoTime();
+        masFuerte = ataqueMasFuerteDYV(datosLiga, 0, datosLiga.size()-1, true);
+        tFinal = System.nanoTime();
+        System.out.printf("Ataque Pokemon más fuerte B (Recursivo - liga): pos=%d, daño=%d Tiempo: %,dns)\n", masFuerte, datosLiga.get(masFuerte)*-1, (tFinal - tInicio));
+
+        /*********************
+        *   COMBATE MUNDIAL  *
+        **********************/
+        System.out.println();
+        System.out.println("--- Leyendo fichero 'combate_mundial.txt' ---");
+        List<Integer> datosMundial = leerArchivo("combate_mundial.txt");
+        System.out.println("Numero de registros: " + datosMundial.size());
+
+        tInicio = System.nanoTime();
+        sumaDanos = sumaDanosIterativo(datosMundial, false);
+        tFinal = System.nanoTime();
+        System.out.printf("Daño neto A (Iterativo - mundial): %d (Tiempo %,dns)\n", sumaDanos, (tFinal-tInicio));
+
+        tInicio = System.nanoTime();
+        sumaDanos = sumaDanosRecursivo(datosMundial, false, 0, datosMundial.size()-1);
+        tFinal = System.nanoTime();
+        System.out.printf("Daño neto A (Recursivo - mundial): %d (Tiempo %,dns)\n", sumaDanos, (tFinal-tInicio));
+
+        tInicio = System.nanoTime();
+        sumaDanos = sumaDanosIterativo(datosMundial, true);
+        tFinal = System.nanoTime();
+        System.out.printf("Daño neto B (Iterativo - mundial): %d (Tiempo %,dns)\n", sumaDanos, (tFinal-tInicio));
+
+        tInicio = System.nanoTime();
+        sumaDanos = sumaDanosRecursivo(datosMundial, true, 0, datosMundial.size()-1);
+        tFinal = System.nanoTime();
+        System.out.printf("Daño neto B (Recursivo - mundial): %d (Tiempo %,dns)\n", sumaDanos*-1, (tFinal-tInicio));
+
+        ganador = ganador(datosLiga);
+        System.out.print("Ganador (mundial): ");
+        if(ganador == 0) System.out.println("Entrenador A");
+        if(ganador == 1) System.out.println("Entrenador B");
+
+        System.out.println();
+
+        tInicio = System.nanoTime();
+        masFuerte = ataqueMasFuerteIt(datosMundial, false);
+        tFinal = System.nanoTime();
+        System.out.printf("Ataque Pokemon más fuerte A (Iterativo - mundial): pos=%d, daño=%d Tiempo: %,dns)\n", masFuerte, datosMundial.get(masFuerte), (tFinal - tInicio));
+
+        tInicio = System.nanoTime();
+        masFuerte = ataqueMasFuerteDYV(datosMundial, 0, datosMundial.size()-1, false);
+        tFinal = System.nanoTime();
+        System.out.printf("Ataque Pokemon más fuerte A (Recursivo - mundial): pos=%d, daño=%d Tiempo: %,dns)\n", masFuerte, datosMundial.get(masFuerte), (tFinal - tInicio));
+
+        tInicio = System.nanoTime();
+        masFuerte = ataqueMasFuerteIt(datosMundial, true);
+        tFinal = System.nanoTime();
+        System.out.printf("Ataque Pokemon más fuerte B (Iterativo - mundial): pos=%d, daño=%d Tiempo: %,dns)\n", masFuerte, datosMundial.get(masFuerte)*-1, (tFinal - tInicio));
+
+        tInicio = System.nanoTime();
+        masFuerte = ataqueMasFuerteDYV(datosMundial, 0, datosMundial.size()-1, true);
+        tFinal = System.nanoTime();
+        System.out.printf("Ataque Pokemon más fuerte B (Recursivo - mundial): pos=%d, daño=%d Tiempo: %,dns)\n\n", masFuerte, datosMundial.get(masFuerte)*-1, (tFinal - tInicio));
+    
+        int ataque = 20, rango = 150;
+        System.out.println("--- Batalla generada aleatoriamente ---");
+        System.out.printf("Ataque: %d Rango: %d\n", ataque, rango);
+        List<Integer> batallaAleatoria = generar(ataque, rango);
+        System.out.println(batallaAleatoria.toString());
     }
 
-    public static List<Integer> leerArchivoDanos(String nombreArchivo) {
-        List<Integer> danos = new ArrayList<>();
+    public static List<Integer> leerArchivo(String nombre) {
+        List<Integer> datos = new ArrayList<>();
         try {
-            Scanner lector = new Scanner(new File(nombreArchivo));
+            Scanner lector = new Scanner(new File(nombre));
             while (lector.hasNextInt()) {
-                danos.add(lector.nextInt());
+                datos.add(lector.nextInt());
             }
             lector.close();
         } catch (Exception e) {
-            System.out.printf("Error leyendo el archivo %s\n", nombreArchivo);
+            System.out.printf("Error leyendo el archivo %s\n", nombre);
             System.exit(1);
         }
-        return danos;
+        return datos;
     }
 
-    public static int sumaDanosIterativo(List<Integer> danos, String entrenador) {
+    public static int sumaDanosIterativo(List<Integer> danos, boolean entrenador) {
         int suma = 0;
         int i = 0;
-        if (entrenador.toLowerCase().equals("a")) {
+
+        if (!entrenador) {
             while (i < danos.size()) {
                 if (danos.get(i) > 0) {
                     suma += danos.get(i);
@@ -72,10 +167,10 @@ class BatallaPokemon {
         return suma;
     }
 
-    public static int sumaDanosRecursivo(List<Integer> v, String entrenador, int li, int ls) {
+    public static int sumaDanosRecursivo(List<Integer> v, boolean entrenador, int li, int ls) {
         if (ls == li) {
-            if ((entrenador.toUpperCase().equals("A") && v.get(li) > 0)
-                    || (entrenador.toUpperCase().equals("B") && v.get(li) < 0)) {
+            if ((!entrenador && v.get(li) > 0)
+                    || (entrenador && v.get(li) < 0)) {
                 return v.get(li);
             } else {
                 return 0;
@@ -84,37 +179,54 @@ class BatallaPokemon {
         int mitad = (li + ls) / 2;
         int sumaIzq = sumaDanosRecursivo(v, entrenador, li, mitad);
         int sumaDer = sumaDanosRecursivo(v, entrenador, mitad + 1, ls);
+        
         return sumaIzq + sumaDer;
     }
 
-    public static void probarMetodos(List<Integer> danos, String entrenador) {
-        long tInicio, tFinal;
-        int resIterativo, resRecursivo;
+    public static int ataqueMasFuerteIt(List<Integer> danos, boolean entrenador) {
+        int pos = 0, tamano = danos.size();
 
-        tInicio = System.nanoTime();
-        resIterativo = sumaDanosIterativo(danos, entrenador);
-        tFinal = System.nanoTime();
+        for (int i = 0; i < tamano; i++) {
+            if (!entrenador && danos.get(i) > danos.get(pos))
+                pos = i;
+            if (entrenador && danos.get(i) < danos.get(pos))
+                pos = i;
+        }
 
-        System.out.printf("Daño neto del entrenador %s (Iterativo): %d (Tiempo: %,dns)\n", entrenador, resIterativo,
-                (tFinal - tInicio));
+        return pos;
+    }
 
-        tInicio = System.nanoTime();
-        resRecursivo = sumaDanosRecursivo(danos, entrenador, 0, danos.size() - 1);
-        tFinal = System.nanoTime();
+    public static int ataqueMasFuerteDYV(List<Integer> v, int li, int ls, boolean entrenador) {
+        if (li == ls)
+            return li;
 
-        if (resRecursivo < 0)
-            resRecursivo *= -1;
+        int mitad = (li + ls) / 2;
+        int masFuerteIzq = ataqueMasFuerteDYV(v, li, mitad, entrenador);
+        int masFuerteDer = ataqueMasFuerteDYV(v, mitad + 1, ls, entrenador);
 
-        System.out.printf("Daño neto del entrenador %s (Recursivo): %d (Tiempo: %,dns)\n", entrenador, resRecursivo,
-                (tFinal - tInicio));
+        int pos = masFuerteIzq;
+        if (!entrenador && v.get(masFuerteDer) > v.get(masFuerteIzq))
+            pos = masFuerteDer;
+        if (entrenador && v.get(masFuerteDer) < v.get(masFuerteIzq))
+            pos = masFuerteDer;
 
+        return pos;
+    }
+
+    public static List<Integer> generar(int N, int R){
+        List<Integer> v = new ArrayList<>();
+
+        for(int i = 0; i < N; i++){
+            v.add((int)(Math.random() * (2*R + 1)) - R);
+        }
+        return v;
     }
 
     public static int ganador(List<Integer> danos) {
         int ganador;
 
-        int danoA = sumaDanosRecursivo(danos, "A", 0, danos.size() - 1);
-        int danoB = sumaDanosRecursivo(danos, "B", 0, danos.size() - 1) * -1;
+        int danoA = sumaDanosRecursivo(danos, false, 0, danos.size() - 1);
+        int danoB = sumaDanosRecursivo(danos, true, 0, danos.size() - 1) * -1;
 
         if (danoA > danoB)
             ganador = 0;
