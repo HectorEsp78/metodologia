@@ -64,7 +64,7 @@ public class Local {
         return baldosa;
     }
 
-    public static int[] colocarBaldosa(int[][] local, int[] baldosa){
+    public static int[] colocarBaldosa(boolean[][] local, int[] baldosa){
         boolean cabeLargo = false, cabeAlto = true;
         int cuentaLargo = 0, cuentaAlto = 0;
         int[] pos = new int[2];
@@ -85,10 +85,10 @@ public class Local {
             }
             else cuentaAlto++;
 
-            if(cuentaAlto == baldosa[1]) cabeAlto = true
+            if(cuentaAlto == baldosa[1]) cabeAlto = true;
         }
 
-        if(!cuentaLargo || !cuentaAlto){
+        if(!cabeLargo || !cabeAlto){
             pos[0] = -1;
             pos[1] = -1;
         }
@@ -116,7 +116,7 @@ public class Local {
             if(cuentaAlto == baldosa[0]) cabeAlto = true;
         }
 
-        if(cuentaAlto && cuentaLargo) cabe = true;
+        if(cabeAlto && cabeLargo) cabe = true;
 
         return cabe;        
     }
