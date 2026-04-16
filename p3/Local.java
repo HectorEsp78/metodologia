@@ -14,7 +14,7 @@ public class Local {
 
 
     public static void main(String[] args){
-        int[] dimLocal = {10,10};
+        int[] dimLocal = {10,15};
         int[][] baldosas = new int[62][2];
 
 
@@ -39,7 +39,6 @@ public class Local {
         }
 
         while(!solucion(dimLocal, areaCubierta, baldosas)){
-            System.out.println("Area cubierta: " + areaCubierta);
             int[] infoBaldosa = seleccionarBaldosa(baldosas);
             int[] baldosa = {infoBaldosa[0], infoBaldosa[1]};
             if(cabe(baldosa, local)){
@@ -49,9 +48,11 @@ public class Local {
                     areaCubierta += baldosa[0]*baldosa[1];
                     baldosas[infoBaldosa[2]][0] = 0;
                     baldosas[infoBaldosa[2]][1] = 0;
-                    for(int f = pos[0]-1; f < pos[0]+baldosa[0]-1; f++){
-                        for(int c = pos[1]-1; c < pos[1]+baldosa[1]-1; c++){
+                    System.out.println("Area cubierta: " + areaCubierta);
+                    for(int f = pos[0]; f < pos[0]+baldosa[0]; f++){
+                        for(int c = pos[1]; c < pos[1]+baldosa[1]; c++){
                             local[f][c] = true;
+                            System.out.println("Marcando posicion (" + f + "," + c + ") como cubierta");
                         }
                     }
                 }
@@ -69,7 +70,7 @@ public class Local {
                 break;
             }
         }
-        return (dimLocal[0]*dimLocal[1]) == areaCubierta && !quedanBaldosas;
+        return (dimLocal[0]*dimLocal[1]) == areaCubierta || !quedanBaldosas;
     }
 
     public static int[] seleccionarBaldosa(int[][] baldosas){
@@ -89,27 +90,35 @@ public class Local {
     }
 
     public static int[] colocarBaldosa(boolean[][] local, int[] baldosa){
-        boolean cabeLargo = false, cabeAlto = true;
-        int cuentaLargo = 0, cuentaAlto = 0;
+        boolean cabeLargo = false, cabeAlto = false, girada = false;
+        int cuentaLargo = 0, cuentaAlto = 0, auxGirar;
         int[] pos = new int[2];
 
         for(int f = 0; f < local.length && !cabeAlto; f++){
-            for(int c = 0; c < local[0].length && !cabeLargo; c++){
-                if(local[f][c]){
-                    cuentaLargo = 0;
-                    pos[1] = c+1;
+            for(int c = 0; c < local[f].length && !cabeLargo; c++){
+                if(local[f][c]) cuentaLargo = 0;
+                else{
+                    pos[1] = c - cuentaLargo;
+                    cuentaLargo++;
                 }
-                else cuentaLargo++;
 
                 if(cuentaLargo == baldosa[0]) cabeLargo = true;
             }
-            if(!cabeLargo){
-                cuentaAlto = 0;
-                pos[0] = f+1;
+            if(!cabeLargo) cuentaAlto = 0;
+            else{
+                pos[0] = f - cuentaAlto;
+                cuentaAlto++;
             }
-            else cuentaAlto++;
 
             if(cuentaAlto == baldosa[1]) cabeAlto = true;
+
+            /*if((!cabeAlto && (f==(local.length - 1))) && !girada){
+                auxGirar = baldosa[0];
+                baldosa[0] = baldosa[1];
+                baldosa[1] = auxGirar;
+                girada = true;
+                f=0;
+            }*/
         }
 
         if(!cabeLargo || !cabeAlto){
@@ -129,12 +138,13 @@ public class Local {
             for(int c = 0; c < local.length && !cabeLargo; c++){
                 if(local[f][c]){
                     cuentaLargo = 0;
+                    cuentaAlto = 0;
                 } 
                 else cuentaLargo++;
 
                 if(cuentaLargo == baldosa[1]) cabeLargo = true;
             }
-            if(local[f][0]) cuentaAlto = 0;
+            if(!cabeLargo) cuentaAlto = 0;
             else cuentaAlto++;
 
             if(cuentaAlto == baldosa[0]) cabeAlto = true;
