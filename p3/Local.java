@@ -17,6 +17,7 @@ public class Local {
         int[] dimLocal = {10,10};
         int[][] baldosas = new int[62][2];
 
+
         for(int i = 0; i < baldosas.length; i++){
             for(int j = 0; j < baldosas[0].length; j++){
                 baldosas[i][j] = 1;
@@ -37,14 +38,38 @@ public class Local {
             }
         }
 
-        while(!solucion(dimLocal, areaCubierta)){
-            int[] baldosa = seleccionarBaldosa(baldosas);
+        while(!solucion(dimLocal, areaCubierta, baldosas)){
+            System.out.println("Area cubierta: " + areaCubierta);
+            int[] infoBaldosa = seleccionarBaldosa(baldosas);
+            int[] baldosa = {infoBaldosa[0], infoBaldosa[1]};
+            if(cabe(baldosa, local)){
+                int[] pos = colocarBaldosa(local, baldosa);
+                if(pos[0] != -1 && pos[1] != -1){
+                    System.out.println("Colocando baldosa de " + baldosa[0] + "x" + baldosa[1] + " en posicion (" + pos[0] + "," + pos[1] + ")");
+                    areaCubierta += baldosa[0]*baldosa[1];
+                    baldosas[infoBaldosa[2]][0] = 0;
+                    baldosas[infoBaldosa[2]][1] = 0;
+                    for(int f = pos[0]-1; f < pos[0]+baldosa[0]-1; f++){
+                        for(int c = pos[1]-1; c < pos[1]+baldosa[1]-1; c++){
+                            local[f][c] = true;
+                        }
+                    }
+                }
+            }
+
         }
       
     }
 
-    public static boolean solucion(int[] dimLocal, int areaCubierta){
-        return (dimLocal[0]*dimLocal[1]) == areaCubierta;
+    public static boolean solucion(int[] dimLocal, int areaCubierta, int[][] baldosas){
+        boolean quedanBaldosas = false;
+        for(int i = 0; i < baldosas.length; i++){
+            if(baldosas[i][0] != 0 && baldosas[i][1] != 0){
+                quedanBaldosas = true;
+                break;
+            }
+        }
+        return (dimLocal[0]*dimLocal[1]) == areaCubierta && !quedanBaldosas;
     }
 
     public static int[] seleccionarBaldosa(int[][] baldosas){
@@ -58,10 +83,9 @@ public class Local {
                 index = i;
             }
         }
-        baldosas[index][0] = 0;
-        baldosas[index][1] = 0;        
+        int[] infoBaldosa = {baldosa[0], baldosa[1], index};     
 
-        return baldosa;
+        return infoBaldosa;
     }
 
     public static int[] colocarBaldosa(boolean[][] local, int[] baldosa){
@@ -110,7 +134,7 @@ public class Local {
 
                 if(cuentaLargo == baldosa[1]) cabeLargo = true;
             }
-            if(local[f][c]) cuentaAlto = 0;
+            if(local[f][0]) cuentaAlto = 0;
             else cuentaAlto++;
 
             if(cuentaAlto == baldosa[0]) cabeAlto = true;
