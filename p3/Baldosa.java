@@ -8,6 +8,7 @@ public class Baldosa {
         this.altura = altura;
         this.longitud = longitud;
         girada = false;
+        colocada = false;
         cabe = true;
     }
 
@@ -22,6 +23,14 @@ public class Baldosa {
         return id;
     }
 
+    public boolean getCabe(){
+        return cabe;
+    }
+
+    public boolean getColocada(){
+        return colocada;
+    }
+
     public void girar(){
         girada = true;
         int aux = altura;
@@ -33,16 +42,8 @@ public class Baldosa {
         return girada;
     }
 
-    public boolean getCabe(){
-        return cabe;
-    }
-
     public void noCabe(){
         cabe = false;
-    }
-
-    public boolean getColocada(){
-        return colocada;
     }
 
     public void colocar(){

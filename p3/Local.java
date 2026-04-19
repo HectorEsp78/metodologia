@@ -1,4 +1,3 @@
-
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
@@ -6,7 +5,7 @@ import java.io.PrintWriter;
 /*
 
     1. Funcion objetivo: minimizar num baldosas
-    2. Candidatos: baldosas de dimensiones 4x3 como maximo
+    2. Candidatos: 40 baldosas de dimensiones 4x3 como maximo (generadas aleatoriamente)
     3. Seleccionados: {}
     4. Funcion solucion: queda suelo sin cubrir?
     5. Funcion factibilidad: cabe x baldosa en el espacio disponible?
@@ -18,9 +17,23 @@ public class Local {
 
 
     public static void main(String[] args){
+        /*
+        Contraejemplo: 
+        int[] dimLocal = {10,10};
+        Baldosa[] baldosas = new Baldosa[45];
+        for(int i = 0; i < 40; i++){
+            baldosas[i] = new Baldosa(i, 1, 1);
+        }
+        baldosas[40] = new Baldosa(40, 5, 5);
+        baldosas[41] = new Baldosa(41, 5, 5);
+        baldosas[42] = new Baldosa(42, 5, 5);
+        baldosas[43] = new Baldosa(43, 5, 5);
+        baldosas[44] = new Baldosa(44, 10, 6);
+        */
+
         int[] dimLocal = {10,15};
-        Baldosa[] baldosas = generarBaldosas(152, 4, 3);
-        int areaCubierta = 0;
+        Baldosa[] baldosas = generarBaldosas(40, 4, 3);
+        int areaCubierta = 0, baldosasUtilizadas = 0;
         boolean[][] local = new boolean[dimLocal[0]][dimLocal[1]];
 
         for(int f = 0; f < local.length; f++){
@@ -31,48 +44,27 @@ public class Local {
 
         imprimirLocal(local);
 
-        boolean solucion = solucion(dimLocal, areaCubierta);
+        int[] pos = new int[2];
+        boolean solucion = solucion(local);
         while(!solucion && quedanBaldosas(baldosas)){
             System.out.printf("Baldosas disponibles: %d\n", baldosasRestantes(baldosas));
             Baldosa baldosa = seleccionarBaldosa(baldosas);
-            if(cabe(baldosa, local)){
-                int[] pos = colocarBaldosa(local, baldosa);
-                if(pos[0] != -1 && pos[1] != -1){
-                    System.out.println("Colocando baldosa de " + baldosa.getLongitud() + "x" + baldosa.getAltura() + " en posicion (" + pos[0] + "," + pos[1] + ")");
-                    areaCubierta += baldosa.area();
-                    baldosa.colocar();
-                    System.out.println("Area cubierta: " + areaCubierta);
-                    for(int f = pos[0]; f < pos[0]+baldosa.getLongitud(); f++){
-                        for(int c = pos[1]; c < pos[1]+baldosa.getAltura(); c++){
-                            local[c][f] = true;
-                        }
-                    }
-                } else {
-                    //baldosa.noCabe();
-                }
+            if(cabe(baldosa, local, pos)){
+                System.out.print("Colocando baldosa ");
+                if(baldosa.esGirada()) System.out.print("GIRADA ");
+                System.out.println("de " + baldosa.getLongitud() + "x" + baldosa.getAltura() + " en posicion (" + pos[0] + "," + pos[1] + ")");
+                colocarBaldosa(local, baldosa, pos);
+                baldosasUtilizadas++;
+
+                areaCubierta += baldosa.area();
+                System.out.println("Area cubierta: " + areaCubierta);
+                
                 imprimirLocal(local);
             } else {
-                baldosa.girar();
-                if(cabe(baldosa, local)){
-                    int[] pos = colocarBaldosa(local, baldosa);
-                if(pos[0] != -1 && pos[1] != -1){
-                    System.out.println("Colocando baldosa GIRADA de " + baldosa.getLongitud() + "x" + baldosa.getAltura() + " en posicion (" + pos[0] + "," + pos[1] + ")");
-                    areaCubierta += baldosa.area();
-                    baldosa.colocar();
-                    System.out.println("Area cubierta: " + areaCubierta);
-                    for(int f = pos[0]; f < pos[0]+baldosa.getLongitud(); f++){
-                        for(int c = pos[1]; c < pos[1]+baldosa.getAltura(); c++){
-                            local[c][f] = true;
-                        }
-                    }
-                } else {
-                    //baldosa.noCabe();
-                }
-                imprimirLocal(local);
-                }
-                baldosa.noCabe();
+                if(baldosa.esGirada()) baldosa.noCabe();
+                else baldosa.girar();
             }
-            solucion = solucion(dimLocal, areaCubierta);
+            solucion = solucion(local);
         }
 
         if(!solucion){
@@ -80,10 +72,23 @@ public class Local {
         } else {
             System.out.println("--- Local Cubierto ---");
             imprimirLocal(local);
+            System.out.println("\nBaldosas utilizadas: " + baldosasUtilizadas);
         }
       
     }
 
+    public static boolean solucion(boolean[][] local){
+        boolean solucion = true;
+
+        for (int i = 0; i < local.length; i++) {
+            for (int j = 0; j < local[i].length; j++) {
+                if(!local[i][j]) solucion = false;   
+            }
+        }
+        return solucion;
+    }
+
+    // No
     public static boolean solucion(int[] dimLocal, int areaCubierta){
         return (dimLocal[0]*dimLocal[1]) == areaCubierta;
     }
@@ -106,67 +111,45 @@ public class Local {
         return baldosa;
     }
 
-    public static int[] colocarBaldosa(boolean[][] local, Baldosa baldosa){
-        boolean cabeLargo = false, cabeAlto = false;
-        int cuentaLargo = 0, cuentaAlto = 0;
-        int[] pos = new int[2];
-
-        for(int f = 0; f < local.length && !cabeAlto; f++){
-            for(int c = 0; c < local[f].length && !cabeLargo; c++){
-                if(local[f][c]) cuentaLargo = 0;
-                else{
-                    pos[0] = c - cuentaLargo;
-                    cuentaLargo++;
-                }
-
-                if(cuentaLargo == baldosa.getLongitud()) cabeLargo = true;
+    public static void colocarBaldosa(boolean[][] local, Baldosa baldosa, int[] pos){
+        baldosa.colocar();
+        for(int f = pos[0]; f < pos[0]+baldosa.getLongitud(); f++){
+            for(int c = pos[1]; c < pos[1]+baldosa.getAltura(); c++){
+                local[c][f] = true;
             }
-            if(!cabeLargo){
-                cuentaAlto = 0;
+        }
+    }
+
+    public static boolean cabe(Baldosa baldosa, boolean[][] local, int[] pos) {
+    int cuentaLargo = 0, cuentaAlto = 0;
+    boolean cabeLargo = false, cabeAlto = false;
+
+    for (int f = 0; f < local.length && !cabeAlto; f++) {
+        cabeLargo = false;
+        cuentaLargo = 0;
+
+        for (int c = 0; c < local[f].length && !cabeLargo; c++) {
+            if (local[f][c]) {
                 cuentaLargo = 0;
+            } else {
+                if (cuentaLargo == 0) pos[0] = c;
+                cuentaLargo++;
             }
-            else{
-                pos[1] = f - cuentaAlto;
-                cuentaAlto++;
-            }
-
-            if(cuentaAlto == baldosa.getAltura()) cabeAlto = true;
+            if (cuentaLargo == baldosa.getLongitud()) cabeLargo = true;
         }
 
-        if(!cabeLargo || !cabeAlto){
-            pos[0] = -1;
-            pos[1] = -1;
+        if (!cabeLargo) {
+            cuentaAlto = 0;
         } else {
-            baldosa.colocar();
-        }
-        return pos;
-    }
-
-    public static boolean cabe(Baldosa baldosa, boolean[][] local){
-        boolean cabe = false;
-        int cuentaLargo = 0, cuentaAlto = 0;
-        boolean cabeLargo = false, cabeAlto = false;
-
-        for(int f = 0; f < local.length && !cabeAlto; f++){
-            for(int c = 0; c < local[f].length && !cabeLargo; c++){
-                if(local[f][c]){
-                    cuentaLargo = 0;
-                    cuentaAlto = 0;
-                } 
-                else cuentaLargo++;
-
-                if(cuentaLargo == baldosa.getLongitud()) cabeLargo = true;
-            }
-            if(!cabeLargo) cuentaAlto = 0;
-            else cuentaAlto++;
-
-            if(cuentaAlto == baldosa.getAltura()) cabeAlto = true;
+            if (cuentaAlto == 0) pos[1] = f;
+            cuentaAlto++;
         }
 
-        if(cabeAlto && cabeLargo) cabe = true;
-
-        return cabe;        
+        if (cuentaAlto == baldosa.getAltura()) cabeAlto = true;
     }
+
+    return cabeAlto && cabeLargo;
+}
 
     public static void imprimirLocal(boolean[][] local){
         System.out.println();
@@ -183,7 +166,7 @@ public class Local {
     public static int baldosasRestantes(Baldosa[] baldosas){
         int nBaldosas = 0;
         for(int i = 0; i < baldosas.length; i++){
-            if(baldosas[i].getCabe()){
+            if(baldosas[i].getCabe() && !baldosas[i].getColocada()){
                 nBaldosas++;
             }
         }
@@ -214,4 +197,6 @@ public class Local {
         }
         return baldosas;
     }
+
+
 }
